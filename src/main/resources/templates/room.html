@@ -1,0 +1,352 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic :: setContent(~{this::content} )}">
+
+	<th:block th:fragment="content">
+
+		<head>
+
+<title>객실 관리</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	background-color: #f7f7f7;
+}
+
+h2 {
+	margin-top: 30px;
+	color: olive;
+}
+
+header {
+	background-image:
+		url('https://www.josunhotel.com/revolution/content/fileImage.do?fileId=253606&cntntsSn=253605');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 26%;
+	margin-bottom: 50px;
+	margin-top: 64px; /* 네비게이션바와 사진사이의 거리  */
+}
+
+section {
+	padding-top: 0rem;
+}
+
+h1 {
+	color: olive;
+	margin-bottom: 0.5rem;
+	margin-top: 3rem;
+}
+
+table {
+	border-collapse: collapse;
+	width: 40%;
+	margin: 2px auto;
+	color: gray; /* 테이블 내용 글자색 */
+}
+
+th, td {
+	border-bottom: 1px solid rgba(128, 128, 0, 0.1);
+	padding: 8px;
+}
+
+th, td { /* 테이블 라인 */
+	padding: 8px;
+	text-align: center;
+	border-bottom: 2px solid rgba(128, 128, 0, 0.2);
+}
+
+thead { /*  테이블 제목 */
+	background-color: olive;
+	color: darkolivegreen; /* 테이블 제목 글자색 */
+	background-color: rgba(128, 128, 0, 0.1);
+	
+}
+
+.blueButton {
+	background-color: #007BFF;
+	border: none;
+	color: white;
+	padding: 3px 6px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin-bottom: 20px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.redButton {
+	background-color: red;
+	padding: 3px 6px;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+button:hover {
+	background-color: dimgray;
+}
+
+input { /* 객실타입 박스 */
+	padding: 5px;
+	border: 1px solid gray;
+	border-radius: 5px;
+	font-size: 14px;
+}
+
+select { /* 객실타입 박스 */
+	padding: 6px;
+	border: 1px solid gray;
+	border-radius: 5px;
+	font-size: 14px;
+}
+
+body {
+	text-align: center;
+}
+
+.blueButton:hover {
+	background-color: dimgray; /* 원하는 색상으로 변경하세요 */
+}
+
+.redButton:hover {
+	background-color: darkred;
+}
+
+.mb-1 { /* 관리자페이지 테이블명과 테이블 사이의 거리 조절 */
+	margin-bottom: 1rem !important;
+}
+
+#addRoomForm { /* 객실추가 부분 글자색 변경 */
+	color: gray;
+}
+
+#roomType { /* 객실추가 부분 셀렉트박스 글자색 변경 */
+	color: gray;
+}
+
+#roomNumber { /* 객실추가 부분 객실번호 상자 테두리색 변경 */
+	border: 1px solid gray;
+}
+
+/* 수정버튼  */
+.modifyButton {
+	background-color: #007BFF;
+	padding: 3px 6px;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.modifyButton:hover {
+	background-color: darkpink;
+}
+</style>
+		</head>
+
+		<body>
+			<header> </header>
+
+
+			<h2 class="text-white-50 mx-auto mt-10 mb-1"
+				style="font-size: 2em; text-shadow: 1px 1px 1px olive; text-align: center;">
+				객실 추가</h2>
+
+			<form id="addRoomForm">
+				<label for="roomNumber">객실 번호:</label> <input type="text"
+					id="roomNumber" name="roomNumber" required>
+
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<!--공백 추가 -->
+
+				<label for="roomType">객실 타입:</label> <select id="roomType"
+					name="roomType">
+					<option th:each="roomType : ${roomTypes}" th:value="${roomType.id}"
+						th:text="${roomType.roomName}"></option>
+				</select> <input type="submit" value="추가" class="blueButton">
+			</form>
+
+			<h2 class="text-white-50 mx-auto mt-10 mb-1"
+				style="font-size: 2em; text-shadow: 1px 1px 1px olive; text-align: center;">
+				객실 관리</h2>
+
+			<table>
+				<thead>
+					<tr>
+
+						<th>객실 번호</th>
+						<th>객실 타입</th>
+						<th>객실 타입 변경</th>
+						<th>삭제</th>
+					</tr>
+				</thead>
+
+
+				<tbody>
+					<!-- rooms 배열을 순회하면서 객실 정보를 표시 -->
+					<tr th:each="room : ${rooms}">
+
+						<td th:text="${room.roomNumber}"></td>
+						<td><span th:if="${room.roomTypes != null}"
+							th:text="${room.roomTypes.roomName}"></span> <span
+							th:unless="${room.roomTypes != null}">객실타입이 선택되지 않았습니다.</span></td>
+						<td>
+							<form th:id="'updateRoomForm_' + ${room.id}"
+								class="update-room-form">
+								<input type="hidden" name="roomId" th:value="${room.id}">
+
+
+
+
+
+								<select name="roomType" required style="color: gray;">
+									<option value="" disabled selected hidden>객실 타입 선택</option>
+									<option th:each="roomType : ${roomTypes}"
+										th:value="${roomType.id}" th:text="${roomType.roomName}"></option>
+								</select>
+
+								<button type="submit" class="modifyButton">변경</button>
+							</form>
+						</td>
+						<td>
+							<button class="redButton" th:onclick="deleteRoom([[${room.id}]])">삭제</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+
+			<script>
+		document.getElementById("addRoomForm").addEventListener("submit", function (event) {
+			event.preventDefault();
+			addRoom();
+		});
+		document.querySelectorAll(".update-room-form").forEach(form => {
+			form.addEventListener("submit", function (event) {
+				event.preventDefault();
+				const formData = new FormData(form);
+
+				const roomId = formData.get("roomId");
+				const roomTypeId = formData.get("roomType");
+
+				updateRoom(roomId, roomTypeId);
+			});
+		});
+
+		function updateRoom(roomId, roomTypeId) {
+			fetch("/admin/room/update", {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					roomId: roomId,
+					roomTypeId: roomTypeId
+				})
+			})
+				.then(response => response.json())
+				.then(data => {
+					location.reload();
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+		}
+
+		// 객실 수정
+		/*function updateRoom() {
+			const formData = new FormData(document.getElementById("updateRoomForm"));
+
+			fetch("/admin/room/update", {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					roomId: formData.get("udtRoomId"),
+					roomTypeId: formData.get("udtRoomTypeId")
+				})
+			})
+				.then(response => response.json())
+				.then(data => {
+					// 서버로부터 응답 받은 데이터를 처리
+					console.log(data);
+					//location.reload();
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+
+		}*/
+
+		// 객실 추가
+		function addRoom() {
+			const formData = new FormData(document.getElementById("addRoomForm"));
+
+			fetch("/admin/room/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					roomNumber: formData.get("roomNumber"),
+					roomType: formData.get("roomType")
+				})
+			})
+				.then(response => response.json())
+				.then(data => {
+					// 서버로부터 응답 받은 데이터를 처리
+					location.reload();
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+		}
+
+		// 객실 삭제
+		// 룸타입 삭제
+		function deleteRoom(room_id) {
+			let data = {
+				id: room_id,
+			};
+
+			fetch('/admin/room/remove', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8'
+				},
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then(result => {
+					result == -1 ? alert("객실을 이용중인 예약이있습니다.") : location.reload()
+				})
+				.catch(error => {
+					console.log(error);
+				});
+
+		}
+	</script>
+		</body>
+
+
+
+
+	</th:block>
+
+</th:block>
+</html>

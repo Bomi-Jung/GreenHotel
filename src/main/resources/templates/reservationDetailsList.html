@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>예약 내역</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 20px;
+}
+
+h1 {
+	color: #007BFF;
+}
+
+table {
+	border-collapse: collapse;
+	width: 80%;
+	margin: 20px auto;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: center;
+}
+
+th {
+	background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+</style>
+</head>
+
+<body>
+	<h1>예약 내역</h1>
+
+	<table>
+		<thead>
+			<tr>
+				<th>예약 번호</th>
+				<th>예약 생성일</th>
+				<th>이름</th>
+				<th>체크인 날짜</th>
+				<th>체크아웃 날짜</th>
+				<th>객실 번호</th>
+				<th>객실 타입</th>
+				<th>총 금액</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			<tr th:each="rd : ${reservtionDetail}">
+				<td th:text="${rd.reservation_id}"></td>
+				<td th:text="${rd.CreatedAt}"></td>
+				<td th:text="${rd.username}"></td>
+				<td th:text="${rd.checkInDate}"></td>
+				<td th:text="${rd.checkOutDate}"></td>
+				<td th:text="${rd.roomNumber}"></td>
+				<td th:text="${rd.roomName}"></td>
+				<td th:text="${rd.totalPrice}"></td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+
+</html>

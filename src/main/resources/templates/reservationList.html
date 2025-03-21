@@ -1,0 +1,227 @@
+<th:block th:replace="~{layout/basic :: setContent(~{this::content} )}">
+
+	<th:block th:fragment="content">
+		<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예약내역</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	background-color: #f7f7f7;
+}
+
+header {
+	background-image:
+		url('https://www.josunhotel.com/revolution/content/fileImage.do?fileId=253606&cntntsSn=253605');
+	background-position: center;
+	background-repeat: no-repeat;
+	width: 100%;
+	height: 50%;
+	margin-bottom: 50px;
+	padding-top: 4rem;
+	padding-bottom: 6rem;
+}
+
+section {
+	padding-top: 4rem;
+	padding-bottom: 5rem;
+	min-height: 180vh;
+}
+
+.container {
+	margin: 0 auto;
+	text-align: center;
+}
+
+h2 {
+	margin-top: 20px;
+	color: olive;
+}
+
+.mb-1 {
+	margin-bottom: 1rem !important;
+}
+
+table {
+	width: 70%;
+	border-collapse: collapse;
+	margin-bottom: 20px;
+	background-color: rgba(248, 248, 255, 0.3);
+	color: gray;
+}
+
+th, td {
+	padding: 10px;
+	text-align: left;
+	border-bottom: 2px solid rgba(128, 128, 0, 0.2);
+}
+
+thead {
+	background-color: olive;
+	color: darkolivegreen;
+	background-color: rgba(128, 128, 0, 0.1);
+}
+
+.btn {
+	padding: 8px 12px;
+	background-color: #4CAF50;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.btn-small {
+	padding: 6px 10px;
+}
+
+.btn-edit {
+	background-color: #4CAF50;
+}
+
+.btn-delete {
+	background-color: #f44336;
+	transition: background-color 0.3s;
+}
+
+.btn-delete:hover {
+	background-color: dimgray;
+}
+
+table.reservation-table {
+	display: inline-table;
+}
+
+#reservationDetailsTable {
+	margin: 0 auto;
+}
+</style>
+		</head>
+
+
+
+		<div class="container">
+				<h2 class="text-white-50 mx-auto mt-10 mb-1"
+					style="font-size: 2em; text-shadow: 1px 1px 1px olive; text-align: center;">
+					예약목록</h2>
+
+				<!-- 예약목록 테이블 -->
+				<table class="reservation-table">
+					<thead>
+						<tr>
+							<th>예약목록</th>
+							<th>예약자</th>
+							<th>총 금액</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="reservation : ${reservationList}"
+							th:onclick="'showReservationDetails(' + ${reservation.reservation_id} + ')'">
+							<td
+								th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (#authorization.expression('hasRole(''ROLE_USER'')') and #authentication.name == reservation.username)}"
+								th:text="${reservation.createdAt}"
+								style="color: blue; cursor: pointer;"></td>
+							<td th:text="${reservation.username}"></td>
+							<td th:text="${reservation.totalPrice + '원'}"></td>
+							<td>
+								<button class="btn btn-small btn-delete"
+									th:onclick="'deleteReservation(' + ${reservation.reservation_id} + ')'">예약취소</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 예약상세 테이블 -->
+
+				<table id="reservationDetailsTable" style="display: none;">
+					<thead>
+						<tr>
+							<th style="width: 10%;">예약 날짜</th>
+							<th style="width: 50%;">객실 사진</th>
+							<th style="width: 10%;">객실 타입</th>
+						</tr>
+					</thead>
+					<tbody id="reservationDetailsBody">
+						<!-- 주문 상세 내역을 여기에 동적으로 추가 -->
+					</tbody>
+				</table>
+
+			</div>
+
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+			<script>
+    function deleteReservation(reservation_id) {
+      let data = {
+        id: reservation_id,
+      };
+
+      fetch('/admin/reservation/remove', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          result == -1 ? alert("객실을 이용중인 예약이있습니다.") : location.reload()
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+
+    function showReservationDetails(reservation_id) {
+
+    	  document.getElementById('reservationDetailsTable').style.display = 'table';
+
+    	  var reservationDetailsBody = document.getElementById('reservationDetailsBody');
+    	  reservationDetailsBody.innerHTML = '';
+
+
+    	  $.ajax({
+    	    type: "GET",
+    	     url: "/admin/reservationList/detail",
+    	    data: {
+    	      reservation_id: reservation_id
+    	    },
+    	    success: function (result) {
+    	      if (result.length > 0) {
+    	        var checkInDate = result[0].date;
+    	        var checkOutDate = result[result.length - 1].date;
+    	        var dateRange = checkInDate + ' ~ ' + checkOutDate;
+
+    	        var roomName = result[0].roomName;
+    	        var imageUrl = result[0].imageUrl || '/uploadfile/이미지없음.png'; // imageUrl을 사용, 없으면 기본값 사용
+
+    	        var roomNumberCell = '<td><img src="' + imageUrl + '" alt="' + roomName + '" style="width:100%; height:auto;"></td>';
+    	        var dateCell = '<td>' + dateRange + '</td>';
+    	        var roomNameCell = '<td>' + roomName + '</td>';
+
+    	        var tableBody = '<tr>' + dateCell + roomNumberCell + roomNameCell + '</tr>';
+    	        reservationDetailsBody.innerHTML = tableBody;
+            
+            
+            
+         // 스크롤 이동 - 페이지를 중앙에 위치하도록 상대적인 이동값을 설정
+            var reservationDetailsTable = document.getElementById('reservationDetailsTable');
+            var scrollOffset = (window.innerHeight - reservationDetailsTable.offsetHeight) / 2; // 페이지를 세로 중앙에 위치하도록 계산
+            window.scrollBy({
+              top: reservationDetailsTable.offsetTop - scrollOffset,
+              behavior: 'smooth'
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        }
+      });
+    }
+  </script>
+
+
+		</html>

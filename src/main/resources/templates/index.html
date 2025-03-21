@@ -1,0 +1,240 @@
+<th:block th:replace="~{layout/basic :: setContent(~{this::content} )}">
+
+	<th:block th:fragment="content">
+		<head>
+<meta charset="UTF-8">
+
+<title>로그인 선택페이지</title>
+<!-- Font Awesome CDN 링크 추가 -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body {
+	font-family: Arial, sans-serif;
+	text-align: center;
+	background-color: #efefef;
+}
+
+h1 {
+	color: #1E90FF;
+}
+
+p {
+	color: #333;
+}
+
+.aaa {
+	display: inline-block;
+	padding: 15px 30px;
+	background-color: olive;
+	color: #FFF;
+	text-decoration: none;
+	border-radius: 5px;
+	transition: background-color 0.3s;
+}
+
+.aaa { /* 버튼  */
+	display: inline-block;
+	padding: 15px 15px;
+	text-decoration: none;
+	border: 1px solid darkslategray;
+	border-radius: 0; /* 각진 모서리 */
+	background-color: olive;
+	color: lemonchiffon;
+	font-size: 20px;
+	transition: background-color 0.3s, color 0.3s;
+	margin-top: 16px; /* 버튼 위치 아래로 조절  */
+	margin-right: 20px; /* 버튼 사이의 간격*/
+	box-shadow: 0 0 2px 2px lemonchiffon;
+}
+
+.aaa:hover {
+	background-color: darkolivegreen;
+	color: gray;
+}
+
+.p-3 {
+	padding: 0.1rem !important;
+}
+
+.nav-link-admin {
+	color: blue !important; /* 파란색으로 변경 */
+}
+
+.nav-link:hover, .nav-link-admin:hover {
+	color: gray !important; /* Change the color on hover */
+	transition: color 0.3s ease; /* Add a smooth transition effect */
+}
+
+.nav-link, .logout-btn {
+	height: 100%; /* 일관된 정렬을 위해 높이를 100%로 설정 */
+	display: flex;
+	align-items: center;
+}
+
+/* 로그아웃 버튼 위치(높이) 조절 */
+.logout-btn {
+	margin-top: 16px;
+}
+
+.navbar-brand, .navbar-toggler, .nav-link {
+	height: 1px; /* 네비게이션 두께 조절*/
+	display: flex;
+	align-items: center; /* 세로 중앙 정렬 */
+}
+
+.navbar-toggler-icon {
+	width: 1.5em; /* 원하는 아이콘 크기로 조절 */
+	height: 1.5em; /* 원하는 아이콘 크기로 조절 */
+}
+
+.navbar-nav {
+	align-items: center;
+	height: 100%; /* 네비게이션 높이를 100%로 설정 */
+}
+
+.nav-item {
+	height: 100%; /* 네비게이션 높이를 100%로 설정 */
+	display: flex;
+	align-items: center; /* 세로 중앙 정렬 */
+}
+
+section {
+	flex: 1;
+	min-height: 120vh; /* (네비게이션바 위의)전체 화면 길이 설정 */
+}
+
+section {
+	padding-top: 4rem;
+	padding-bottom: 5rem;
+}
+
+#footerbar {
+	width: 100%;
+	background-color: olive;
+	opacity: 60%;
+	height: 60px;
+}
+
+nav.navbar {
+	height: 64px !important; /* 네비게이션바 두께조절 */
+}
+
+/* 로고 위치 조절 */
+.content-container {
+	margin-top: 6rem; /* 로고 위치 조절 */
+}
+
+.image-container {
+	position: fixed; /* 고정 위치 */
+	left: 0;
+	width: 100%;
+	height: 100vh; /* 화면 높이 만큼 설정 */
+	overflow: hidden;
+	z-index: -1; /* 다른 요소 위에 표시하기 위해 z-index 설정 */
+}
+
+.image-container img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover; /* 이미지 비율 유지하며 커버하도록 설정 */
+}
+</style>
+
+		</head>
+		<body>
+			<nav class="navbar navbar-expand-lg navbar-light fixed-top py-2"
+				id="mainNav" style="background-color: rgba(128, 128, 0, 0.5);">
+				<div class="container px-4 px-lg-5">
+					<a class="navbar-brand" href="https://greenhotel.store"
+						style="font-family: 'Lobster', cursive; text-decoration: none; color: #fff; font-size: 1.7em;">The
+						Green</a>
+					<button class="navbar-toggler" type="button"
+						data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+						aria-controls="navbarResponsive" aria-expanded="false"
+						aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<!-- Integrated navigation and Thymeleaf logout button -->
+					<div class="collapse navbar-collapse" id="navbarResponsive">
+						<ul class="navbar-nav ms-auto my-2 my-lg-0">
+							<!-- Thymeleaf logout button for ROLE_USER -->
+							<li
+								th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}"
+								class="nav-item" style="display: inline-block;">
+								<form th:action="@{/logout}" method="post">
+									<button class="nav-link logout-btn text-white" type="submit"
+										style="border: none; background: none; cursor: pointer; transition: color 0.3s ease;">로그아웃</button>
+								</form>
+							</li>
+							<!-- Bootstrap navigation items for ROLE_USER -->
+							<li class="nav-item"><a class="nav-link text-white"
+								th:unless="${#authorization.expression('isAuthenticated()')}"
+								href="/login">로그인</a></li>
+							<li class="nav-item"><a class="nav-link text-white"
+								th:if="${#authorization.expression('!isAuthenticated()')}"
+								href="/register">회원가입</a></li>
+							<li class="nav-item"
+								th:unless="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"><a
+								class="nav-link text-white" href="/home/reservationList">예약확인</a></li>
+							<li class="nav-item"><a class="nav-link text-white" href="/home/Board/list">고객문의</a></li>
+
+							<!-- Thymeleaf logout button for ROLE_ADMIN -->
+							<li
+								th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+								class="nav-item" style="display: inline-block;">
+								<form th:action="@{/logout}" method="post">
+									<button class="nav-link logout-btn text-white" type="submit"
+										style="border: none; background: none; cursor: pointer; transition: color 0.3s ease;">로그아웃</button>
+								</form>
+							</li>
+							<!-- Bootstrap navigation items for ROLE_ADMIN -->
+							<li
+								th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+								class="nav-item" style="display: inline-block;"><a
+								class="nav-link text-white nav-link-admin"
+								href="/admin/reservationList">예약 관리</a></li>
+							<li
+								th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+								class="nav-item" style="display: inline-block;"><a
+								class="nav-link text-white nav-link-admin" href="/admin/room">객실
+									관리</a></li>
+							<li
+								th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+								class="nav-item" style="display: inline-block;"><a
+								class="nav-link text-white nav-link-admin"
+								href="/admin/roomtype">객실타입 관리</a></li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+
+
+			<div class="image-container">
+				<img
+					src="https://www.lahanhotels.com/revolution/content/fileImage.do?fileId=16880&cntntsSn=16384"
+					alt="Awards Image">
+			</div>
+
+
+
+			<section>
+				<div class="content-container">
+					<h1 class="text-white-50 mx-auto mt-2 mb-1"
+						style="font-family: 'Lobster', cursive; font-size: 9em; text-shadow: 2px 2px 2px olive;">
+						The Green</h1>
+
+					<h2 class="text-white-50 mx-auto mt-1 mb-4"
+						style="font-size: 2em; text-shadow: 1px 1px 2px gold; text-align: center;">HOTELS
+						& RESORTS</h2>
+					<a class="aaa" href="/login"><i class="fas fa-user"></i><br>사용자
+						로그인 </a> <a class="aaa" href="/login"><i class="fas fa-user-cog"></i><br>관리자
+						로그인</a>
+
+				</div>
+			</section>
+		</body>
+		</html>
+	</th:block>
+
+</th:block>

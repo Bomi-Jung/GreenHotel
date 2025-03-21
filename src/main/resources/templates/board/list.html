@@ -1,0 +1,156 @@
+
+<th:block th:replace="~{layout/basic :: setContent(~{this::content} )}">
+
+	<th:block th:fragment="content">
+
+		<head>
+
+<meta charset="UTF-8">
+<title>고객문의 게시판</title>
+<!-- Favicon-->
+<link rel="icon" type="image/x-icon" th:href="@{/assets/favicon.ico}" />
+<!-- Core theme CSS (includes Bootstrap)-->
+<link th:href="@{/css/styles.css}" rel="stylesheet" />
+<!-- Bootstrap core JS-->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	integrity="sha384-..." crossorigin="anonymous">
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Core theme JS-->
+<script th:src="@{/js/scripts.js}"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+			<style>
+
+
+
+				section {
+                    padding-left: 50px; /* 왼쪽 패딩 */
+                    padding-right: 50px; /* 오른쪽 패딩 */
+
+                .underline { border-bottom : 3px
+                    solid rgba( 128, 128, 0, 0.6);
+                    display: inline-block;
+                }
+
+                .container {
+                    text-align: center;
+                }
+
+                .centered-id {
+                    text-align: center; /* 가운데 정렬 */
+                }
+
+                .table thead th {
+                    background-color: rgba(128, 128, 0, 0.6); /* 배경색과 투명도 설정 */
+                    text-align: center; /* 텍스트 가운데 정렬 */
+                }
+
+                .header-bg {
+                padding : 0;
+                  background-color: olive; /* 원하는 배경색 */
+                  height: 100px; /* 상단 영역 높이 설정 */
+                }
+
+
+			</style>
+
+		</head>
+
+
+
+
+
+		<div class="container">
+			<h2 class="underline">고객문의게시판</h2>
+
+
+			<div class="mb-3 text-end">
+				<a id="inquiryBtn" href="javascript:void(0);"
+				   th:attr="data-is-logged-in=${isLoggedIn ? 'true' : 'false'}"
+				   class="btn btn-primary"
+				   style="background-color: rgba(128, 128, 0, 0.6); border: none;">
+					문의하기 </a>
+			</div>
+
+			<!--  팝업 메시지 (처음에는 숨김)  -->
+			<div id="loginMessage" style="display: none; color: red;">로그인이
+				필요합니다.</div>
+		</div>
+
+
+
+
+		<table class="table centered-id">
+			<thead>
+			<tr>
+				<th scope="col">게시글 번호</th>
+				<th scope="col">제목</th>
+				<th scope="col">작성자</th>
+				<th scope="col">작성일자</th>
+				<th scope="col">조회수</th>
+				<th scope="col">답변상태</th>
+
+			</tr>
+			</thead>
+			<tbody>
+
+			<tr th:each="board : ${boards}">
+				<td class="centered-id" th:text="${board.postId}">1</td>
+				<td><a
+						th:href="@{/board/detail/{postId}(postId=${board.postId})}"
+						th:text="${board.title}">제목</a></td>
+				<td
+						th:text="${board.userId != null ? board.userId.nickname : '익명'}">작성자</td>
+				<td th:text="${board.formattedDate}">2024-01-01</td>
+				<td th:text="${board.viewCount}">0</td>
+
+				<td><span
+						th:if="${board.status == T(com.smhrd.hotelreservation.model.entity.Board$Status).ANSWERED}">답변완료✅</span>
+					<span
+							th:if="${board.status == T(com.smhrd.hotelreservation.model.entity.Board$Status).UNANSWERED}">답변 대기</span>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+
+
+
+		<script>
+			$(document)
+					.ready(
+							function() {
+								$('#inquiryBtn')
+										.click(
+												function() {
+													var isLoggedIn = $(this)
+															.data(
+																	'is-logged-in')
+															.toString() === "true";
+													console
+															.log($(
+																	'#inquiryBtn')
+																	.data(
+																			'is-logged-in'));
+													if (!isLoggedIn) {
+														$('#loginMessage')
+																.show();
+														setTimeout(
+																function() {
+																	window.location.href = '/login';
+																}, 1000);
+													} else {
+														window.location.href = '/board/create';
+													}
+												});
+							});
+		</script>
+
+
+		</body>
+		</html>
+
+	</th:block>
+
+</th:block>
